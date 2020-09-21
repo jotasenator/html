@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cola restaurante</title>
+  </head>
+  <body>
+    <h1>Restaurante WEBeeF</h1>
+    <h2>Comensales</h2>
+    <input type="text" id="comensales" size="10" />
+
+    <h2>Nombre</h2>
+    <input type="text" id="nombre" size="10" />
+    <button id="adicionar">Adicionar</button>
+    <br />
+    <br />
+    <br />
+    <button id="sacar">Sacar</button>
+    <br />
+    <br />
+    <br />
+    <div id="resultado">Aquí se mostrará el resultado de la cola existente</div>
+
+    <script>
+      //lista
+      listaCola = [];
+
+      //comensales
+      var comensales = document.getElementById("comensales");
+      comensales.onblur = () => {
+        comensales.value;
+        if (isNaN(comensales.value) === false) {
+          console.log(comensales.value);
+          location.reload();
+        } else {
+          comensales.value = "";
+        }
+      };
+
+      //nombre de la persona a dicionar a la cola
+      var nombre = document.getElementById("nombre");
+
+      //adicionar
+      var adicionar = document.getElementById("adicionar");
+      adicionar.onclick = () => {
+        if (
+          nombre.value !== "" &&
+          listaCola.length < comensales.value &&
+          isNaN(nombre.value)
+        ) {
+          listaCola.push(nombre.value);
+
+          console.log("Agregado a la cola", listaCola);
+          var parseListaCola = [...listaCola].join(" - ");
+          document.getElementById("resultado").innerHTML = parseListaCola;
+
+          nombre.value = "";
+        }
+        console.log(listaCola.length);
+      };
+
+      //sacar
+      var sacar = document.getElementById("sacar");
+
+      sacar.onclick = () => {
+        if (listaCola[0] !== undefined) {
+          var primero = listaCola[0];
+          listaCola.shift();
+          listaCola.join("-");
+          console.log(
+            "Despues que sale '",
+            primero,
+            "' asi queda la cola: ",
+            listaCola
+          );
+          var parseListaCola = [...listaCola].join(" - ");
+          document.getElementById("resultado").innerHTML = parseListaCola;
+          console.log(listaCola.length);
+        }
+      };
+    </script>
+  </body>
+</html>
