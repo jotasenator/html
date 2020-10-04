@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style></style>
+    <title>Replanteo de Puntos por Coordenadas</title>
+    <style>
+      body {
+        background-color: black;
+      }
+      .container {
+        width: 300px;
+        margin: 0 auto;
+        background-color: gray;
+        padding: 0px 20px 20px 5px;
+
+        border-radius: 15px;
+      }
+      h2 {
+        text-align: center;
+      }
+      h3 {
+        padding-left: 5px;
+      }
+      .salida {
+        background-color: honeydew;
+        padding: 5px 0 5px 10px;
+        font-size: 90%;
+        border-radius: 5px;
+      }
+      input {
+        background-color: honeydew;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Replanteo</h2>
+
+      <h3>Estacionado:</h3>
+
+      <table>
+        <tr></tr>
+        <tr>
+          <th>X(m)</th>
+          <th>Y(m)</th>
+        </tr>
+        <tr>
+          <td>
+            <input type="text" id="x1" size="8" placeholder="123456.123" />
+          </td>
+          <td><input type="text" id="y1" size="8" /></td>
+
+          <td><button id="resetear1">X</button></td>
+        </tr>
+      </table>
+
+      <h3>Referencia</h3>
+
+      <table>
+        <tr>
+          <th>X(m)</th>
+          <th>Y(m)</th>
+        </tr>
+        <tr>
+          <td>
+            <input type="text" id="x2" size="8" />
+          </td>
+          <td>
+            <input type="text" id="y2" size="8" />
+          </td>
+
+          <td><button id="resetear2">X</button></td>
+        </tr>
+      </table>
+
+      <h3>Punto a replantear:</h3>
+
+      <table>
+        <tr>
+          <th>X(m)</th>
+          <th>Y(m)</th>
+        </tr>
+        <tr>
+          <td>
+            <input type="text" id="x3" size="8" />
+          </td>
+          <td>
+            <input type="text" id="y3" size="8" />
+          </td>
+
+          <td><button id="resetear3">X</button></td>
+
+          <td><button id="calcular">Calcular</button></td>
+        </tr>
+      </table>
+
+      <br />
+      <div class="salida">
+        <div id="distancia">Distancia:</div>
+        <div id="anguloReplanteo">Ángulo de replanteo:</div>
+      </div>
+    </div>
+
+    <script>
+      //selecciono casillas de valores de la base
+      let x1 = document.getElementById("x1");
+
+      let y1 = document.getElementById("y1");
+
+      let x2 = document.getElementById("x2");
+
+      let y2 = document.getElementById("y2");
+
+      //funciones para validar el dato en estas casillas
+      const re = /[0-9]{6}.[0-9]{3}/;
+
+      x1.onmouseleave = () => {
+        if (re.exec(x1.value) != x1.value) {
+          x1.value = "";
+        }
+      };
+      y1.onmouseleave = () => {
+        if (re.exec(y1.value) != y1.value) {
+          y1.value = "";
+        }
+      };
+      x2.onmouseleave = () => {
+        if (re.exec(x2.value) != x2.value) {
+          x2.value = "";
+        }
+      };
+      y2.onmouseleave = () => {
+        if (re.exec(y2.value) != y2.value) {
+          y2.value = "";
+        }
+      };
+
+      //selecciono casillas de valores del punto de interes
+      let x3 = document.getElementById("x3");
+
+      let y3 = document.getElementById("y3");
+
+      //funciones para validar el dato en estas casillas
+      x3.onmouseleave = () => {
+        if (re.exec(x3.value) != x3.value) {
+          x3.value = "";
+        }
+      };
+      y3.onmouseleave = () => {
+        if (re.exec(y3.value) != y3.value) {
+          y3.value = "";
+        }
+      };
+
+      let acimut;
+      let dxb;
+      let dyb;
+
+      //funcion para calcular acimut base
+      const acimutBase = () => {
+        //deltas que me permitiran saber el cuadrante y calcular acimut de la base
+        dxb = x2.value - x1.value;
+        dyb = y2.value - y1.value;
+
+        //evitando que los deltas sean ceros
+        if (dxb == 0) {
+          dxb = 0.000001;
+        } else if (dyb == 0) {
+          dyb = 0.000001;
+        }
+
+        //calculando el acimut de la base del levantamiento
+
+        if (dxb > 0 && dyb > 0) {
+          acimut = (Math.atan(dxb / dyb) * 180) / Math.PI;
+        } else if (dxb > 0 && dyb < 0) {
+          acimut = 180 + (Math.atan(dxb / dyb) * 180) / Math.PI;
+        } else if (dxb < 0 && dyb < 0) {
+          acimut = 180 + (Math.atan(dxb / dyb) * 180) / Math.PI;
+        } else if (dxb < 0 && dyb > 0) {
+          acimut = 360 + (Math.atan(dxb / dyb) * 180) / Math.PI;
+        }
+      };
+
+      let acimut1;
+      let dxp;
+      let dyp;
+
+      //funcion calcular acimut con respecto al punto de interes
+      const acimutInteres = () => {
+        //deltas del punto de interes
+        dxp = x3.value - x1.value;
+        dyp = y3.value - y1.value;
+
+        //evitando que los deltas sean ceros
+        if (dxp == 0) {
+          dxp = 0.000001;
+        } else if (dyp == 0) {
+          dyp = 0.000001;
+        }
+
+        //calculando el acimut con respecto al punto de interes
+        if (dxp > 0 && dyp > 0) {
+          acimut1 = (Math.atan(dxp / dyp) * 180) / Math.PI;
+        } else if (dxp > 0 && dyp < 0) {
+          acimut1 = 180 + (Math.atan(dxp / dyp) * 180) / Math.PI;
+        } else if (dxp < 0 && dyp < 0) {
+          acimut1 = 180 + (Math.atan(dxp / dyp) * 180) / Math.PI;
+        } else if (dxp < 0 && dyp > 0) {
+          acimut1 = 360 + (Math.atan(dxp / dyp) * 180) / Math.PI;
+        }
+      };
+
+      //calcular la distancia y angulo de replanteo
+      let calcular = document.getElementById("calcular");
+
+      calcular.onclick = () => {
+        //calculo
+        acimutBase();
+        acimutInteres();
+        if (
+          x1.value != "" &&
+          (x2.value != "") & (x3.value != "") &&
+          y1.value != "" &&
+          y2.value != "" &&
+          y3.value != ""
+        ) {
+          let distancia =
+            Math.round(Math.sqrt(dxp * dxp + dyp * dyp) * 1000) / 1000;
+
+          let anguloDecimal;
+
+          if (acimut > acimut1) {
+            anguloDecimal = 360 - acimut + acimut1;
+          } else if (acimut1 > acimut) {
+            anguloDecimal = acimut1 - acimut;
+          }
+
+          //parseando en grados minutos y segundos
+
+          let grados = Math.floor(anguloDecimal);
+          let minutos = Math.floor((anguloDecimal - grados) * 60);
+          let segundos =
+            Math.round(
+              ((anguloDecimal - grados) * 60 - Math.floor(minutos)) * 60 * 100
+            ) / 100;
+
+          //60 s =1 m,60=1grado
+          if (segundos == 60) {
+            segundos = 0;
+            minutos += 1;
+            if (minutos == 60) {
+              minutos = 0;
+              grados += 1;
+            }
+          } else if (minutos == 60) {
+            minutos = 0;
+            grados += 1;
+          }
+
+          //salida de los resultados
+          let distanciaFinal = `Distancia: ${distancia} m.`;
+          let anguloFinal = `Ángulo de replanteo: ${grados}° ${minutos}' ${segundos}".`;
+
+          document.getElementById("distancia").innerHTML = distanciaFinal;
+          document.getElementById("anguloReplanteo").innerHTML = anguloFinal;
+        }
+      };
+      //resetear valores de casillas con botones de reset
+      let resetear1 = document.getElementById("resetear1");
+      let resetear2 = document.getElementById("resetear2");
+      let resetear3 = document.getElementById("resetear3");
+
+      resetear1.onclick = () => {
+        x1.value = "";
+        y1.value = "";
+
+        document.getElementById("distancia").innerHTML = "Distancia:";
+        document.getElementById("anguloReplanteo").innerHTML =
+          "Ángulo de replanteo:";
+      };
+
+      resetear2.onclick = () => {
+        x2.value = "";
+        y2.value = "";
+
+        document.getElementById("distancia").innerHTML = "Distancia:";
+        document.getElementById("anguloReplanteo").innerHTML =
+          "Ángulo de replanteo:";
+      };
+      resetear3.onclick = () => {
+        x3.value = "";
+        y3.value = "";
+
+        document.getElementById("distancia").innerHTML = "Distancia:";
+        document.getElementById("anguloReplanteo").innerHTML =
+          "Ángulo de replanteo:";
+      };
+    </script>
+  </body>
+</html>
