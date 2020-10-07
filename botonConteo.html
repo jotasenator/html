@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boton que reinicia el conteo</title>
+    <style>
+      button {
+        height: 100px;
+        width: 200px;
+        text-align: center;
+        font-size: 30px;
+        color: white;
+        background: rgb(25, 169, 77);
+        border-radius: 10px;
+        box-shadow: 5px 10px 8px #888888;
+        outline: none;
+      }
+      .container {
+        margin: 0 auto;
+        width: 200px;
+      }
+      div {
+        display: block;
+        padding-top: 10%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <button id="contador">0</button>
+    </div>
+    <script>
+      let contador = 1;
+      let conteo = document.getElementById("contador");
+      conteo.onclick = () => {
+        conteo.innerHTML = contador;
+        contador += 1;
+        if (contador > 3) {
+          contador = 0;
+        }
+      };
+    </script>
+  </body>
+</html>
