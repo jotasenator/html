@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pago de corriente CUBA</title>
+    <style>
+        body{
+            height: 100%;
+            background-color: burlywood;
+            
+            
+        }
+        .todo{
+            font-size:larger; 
+            
+        }
+
+        
+    </style>
+      
+
+    <h1>Consumo de electricidad</h1>
+    <div id="fecha"></div>
+    <br/>
+  </head>
+  <body>
+      <div class="todo">
+      <input type ="text" size="5" id="valorInicial"> Lectura inicial (kw/h)</input>
+      <br/><br/>
+      <input  type ="text" size="5" id='valorFinal'> Lectura final (kw/h)</input>
+      <br/><br/>
+      <button id="calcular">Calcular</button>
+      <br/>
+      <br/>
+      <div id="consumido"></div>
+      <div id="resultado"></div>
+      </div>
+    <script>
+
+        // fecha
+        fecha=new Date
+        agno=fecha.getUTCFullYear()
+        mes=fecha.getMonth()
+        dia=fecha.getDate()
+
+        switch (mes) {
+            case 0:
+                mes='Enero';
+                break;
+            case 1:
+                mes='Febrero';
+                break;
+            case 2:
+                mes='Marzo';
+                break;
+            case 3:
+                mes='Abril';
+                break;
+            case 4:
+                mes='Mayo';
+                break;
+            case 5:
+                mes='Junio';
+                break;
+            case 6:
+                mes='Julio';
+                break;
+            case 7:
+                mes='Agosto';
+                break;
+            case 8:
+                mes='Septiembre';
+                break;
+            case 9:
+                mes='Octubre';
+                break;
+            case 10:
+                mes='Noviembre';
+                break;
+            case 11:
+                mes='Diciembre'
+                break;
+               
+        }
+
+
+        document.getElementById('fecha').innerHTML=` ${dia} de  ${mes} del ${agno}`
+        
+
+
+
+        // precios
+      const lista_precios = [
+        0.33,
+        1.07,
+        1.43,
+        2.46,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9.2,
+        9.45,
+        9.85,
+        10.8,
+        11.8,
+        12.9,
+        13.95,
+        15,
+      ];
+
+      const lista_rango_kw = [
+        [1, 100],
+        [101, 150],
+        [151, 200],
+        [201, 250],
+        [251, 300],
+        [301, 350],
+        [351, 400],
+        [401, 450],
+        [451, 500],
+        [501, 600],
+        [601, 700],
+        [701, 1000],
+        [1001, 1800],
+        [1801, 2600],
+        [2601, 3400],
+        [3401, 4200],
+        [4201, 5000],
+      ];
+      let precio_pagar;
+
+      let lista_precios_rango = [];
+
+      lista_precios.forEach((j, i) =>
+        lista_precios_rango.push(
+          (lista_rango_kw[i][1] - lista_rango_kw[i][0] + 1) * j
+        )
+      );
+      
+      let valorInicial=document.getElementById('valorInicial')
+      let valorFinal=document.getElementById('valorFinal')
+
+      valorInicial.onblur = () => {
+        valorInicial.value;
+        if (isNaN(valorInicial.value) === false && valorInicial.value>=0) {
+           
+            console.log(valorInicial.value);           
+
+        }else{
+            valorInicial.value = "";
+
+        }
+                  
+    };
+
+      valorFinal.onblur = () => {
+        valorFinal.value;
+        if (isNaN(valorFinal.value) === false && valorFinal.value>=0 &&
+         isNaN(valorInicial.value)===false && valorFinal.value>=valorInicial.value) {
+          console.log(valorFinal.value);
+          let kw_consumidos=valorFinal.value-valorInicial.value
+          console.log(kw_consumidos)
+          let calcular=document.getElementById('calcular')
+
+          calcular.onclick=()=>{
+
+            if(kw_consumidos>=0 && valorInicial.value!=='' && valorFinal.value!==''){
+                calculoResultados(kw_consumidos)
+
+            }else{
+                alert('Esta operación es imposible con esos valores')
+            }
+        
+          
+    }
+          
+          //location.reload();
+        } else {
+          valorFinal.value = "";
+        }
+      };
+
+    
+      
+    const calculoResultados=(kw_consumidos)=>{
+        if (kw_consumidos > 0 && kw_consumidos <= 5000) {
+            contador = 0;
+            for (let i of lista_rango_kw) {
+            contador += 1;
+                if (kw_consumidos <= i[1] && kw_consumidos >= i[0]) {
+                    if (contador == 1) {
+                    precio_pagar = kw_consumidos * 0.33;
+                    } else if (contador > 1 && contador < 18) {
+                    precio_pagar =
+                        lista_precios_rango
+                        .slice(0, contador - 1)
+                        .reduce((x, y) => x + y) +
+                        (kw_consumidos - lista_rango_kw[contador - 2][1]) *
+                        lista_precios[contador - 1];
+                    }
+                }
+            }
+        }else if (kw_consumidos > 5000) {
+            precio_pagar =
+            lista_precios_rango.reduce((x, y) => x + y) +
+            (kw_consumidos - 5000) * 20;
+        }else if(kw_consumidos===0){
+            precio_pagar=0
+        }
+    
+        
+
+  
+        document.getElementById('consumido').innerHTML=`Usted a consumido ${kw_consumidos} kw/h.`
+        document.getElementById('resultado').innerHTML=`El precio  a pagar es de ${Math.round(precio_pagar*100)/100} pesitos.`
+
+    }  
+    
+
+      
+      
+    </script>
+  </body>
+</html>
